@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horta Viva - Do Prato ao Vaso</title>
+    <style>
+        :root {
+            --primary: #2e7d32;
+            --primary-light: #e8f5e9;
+            --accent: #ff9100;
+            --background: #f1f8e9;
+            --card-bg: #ffffff;
+            --text: #1b5e20;
+            --text-muted: #558b2f;
+            --border: #c8e6c9;
+            --danger: #d32f2f;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Simulador de Tela de Celular */
+        .app-container {
+            width: 100%;
+            max-width: 412px;
+            height: 844px;
+            background-color: var(--background);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+            border-radius: 32px;
+            border: 8px solid #333;
+        }
+
+        /* Topbar */
+        .app-header {
+            background-color: var(--card-bg);
+            padding: 20px 16px 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            z-index: 10;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            background-color: var(--primary-light);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Corpo de conteúdo */
+        .app-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            padding-bottom: 90px;
+        }
+
+        .app-content::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Sistema de exibição das Telas */
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        h2 {
+            font-size: 22px;
+            margin-bottom: 6px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        /* Widgets da Home */
+        .alert-card {
+            background-color: var(--primary-light);
+            border-left: 5px solid var(--primary);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .alert-title {
+            font-weight: bold;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .info-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .info-card:active {
+            transform: scale(0.95);
+        }
+
+        .card-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        /* Vaso Interativo */
+        .canvas-container {
+            background: #fff;
+            border: 2px dashed var(--primary);
+            border-radius: 20px;
+            padding: 16px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .vaso-virtual {
+            width: 180px;
+            height: 180px;
+            background: #d7ccc8;
+            border: 6px solid #8d6e63;
+            border-radius: 50%;
+            margin: 20px auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 10px;
+            padding: 20px;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
+        }
+
+        .slot {
+            width: 50px;
+            height: 50px;
+            background: #a1887f;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 22px;
+            cursor: pointer;
+            border: 2px dashed rgba(255,255,255,0.5);
+            transition: all 0.3s;
+        }
+
+        .slot.filled {
+            background: #81c784;
+            border: 2px solid var(--primary);
+        }
+
+        .planta-selector {
+            display: flex;
+            justify-content: space-around;
+            background: var(--primary-light);
+            padding: 12px;
+            border-radius: 12px;
+            margin-top: 16px;
+            gap: 8px;
+        }
+
+        .planta-option {
+            background: white;
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            flex: 1;
+        }
+
+        .planta-option.selected {
+            border: 2px solid var(--accent);
+            background-color: #fff3e0;
+        }
+
+        .feedback-painel {
+            background: #fff9c4;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            margin-top: 12px;
+            font-weight: 500;
+            border-left: 5px solid #fbc02d;
+            text-align: left;
+            line-height: 1.4;
+        }
+
+        /* Botão de Colheita */
+        .harvest-btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 16px;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 15px;
+            box-shadow: 0 4px 15px rgba(255,145,0,0.3);
+        }
+
+        .recipe-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 16px;
+            border: 1px solid var(--border);
+        }
+
+        .recipe-content {
+            padding: 16px;
+        }
+
+        .recipe-tag {
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+        /* Barra de Navegação Inferior */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 72px;
+            background-color: var(--card-bg);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding-bottom: 8px;
+            z-index: 10;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-muted);
+            font-size: 11px;
+            cursor: pointer;
+            width: 25%;
+            transition: color 0.2s;
+            background: none;
+            border: none;
+            padding-top: 8px;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .nav-icon {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- HEADER -->
+        <header class="app-header">
+            <div class="brand">🌱 <span>Horta Viva</span></div>
+            <div class="avatar" onclick="alert('Seu Perfil Ecológico:\nNível 3: Protetor dos Brotos\nAssinatura: Ativa (Sem Anúncios)')">U</div>
+        </header>
+
+        <!-- CONTEÚDO PRINCIPAL DINÂMICO -->
+        <main class="app-content">
+            
+            <!-- TELA 1: HOME -->
+            <section id="screen-home" class="screen active">
+                <h2>Olá, Cultivador!</h2>
+                <p class="subtitle">Seu jardim urbano precisa de atenção hoje.</p>
+                
+                <div class="alert-card">
+                    <div class="alert-title">💧 Lembrete Inteligente</div>
+                    <p style="font-size: 14px;">O dia está quente em sua região. Regue o <strong>Manjericão</strong> às 18h com 200ml de água.</p>
+                </div>
+
+                <div class="card-grid">
+                    <div class="info-card" onclick="direcionarMenu('vaso')">
+                        <div class="card-icon">🪵</div>
+                        <strong>Meus Vasos</strong>
+                        <p style="font-size: 11px; color: var(--text-muted); margin-top:4px;">1 Vaso ativo</p>
+                    </div>
